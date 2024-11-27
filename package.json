@@ -1,0 +1,22 @@
+{
+  "name": "videofans-mediacenter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "fluent-ffmpeg": "^2.1.3",
+    "fs-extra": "^11.2.0",
+    "lucide-vue-next": "^0.462.0",
+    "path": "^0.12.7",
+    "uuid": "^11.0.3"
+  }
+}
