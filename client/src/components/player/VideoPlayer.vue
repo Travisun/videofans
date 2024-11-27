@@ -2,7 +2,7 @@
   <div class="video-player relative" @keydown="handleKeyDown">
     <video
         ref="videoRef"
-        class="w-full h-full bg-black"
+        class="w-full h-screen bg-black"
         :src="videoUrl"
         :poster="poster"
         @timeupdate="handleTimeUpdate"
@@ -24,6 +24,8 @@
         @toggle-play="togglePlay"
         @seek="seek"
         @next="handleVideoEnded"
+        :show-prev-next="true"
+        @previous="$emit('video-previous')"
     />
 
     <!-- 倒计时提示 -->
@@ -33,10 +35,15 @@
     >
       <p class="text-white">
         下一集将在 {{ nextVideoCountdown }} 秒后播放...
+        <button
+            class="ml-4 text-blue-400 hover:text-blue-300"
+            @click="cancelAutoPlay"
+        >
+          取消
+        </button>
       </p>
     </div>
 
-    <!-- Loading spinner -->
     <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent"></div>
     </div>
@@ -54,7 +61,7 @@ const props = defineProps({
   poster: String
 })
 
-const emit = defineEmits(['video-ended'])
+const emit = defineEmits(['video-ended', 'video-previous'])
 
 const videoRef = ref(null)
 const isPlaying = ref(false)
@@ -78,6 +85,51 @@ const handleVideoEnded = () => {
     }
   }, 1000)
 }
+
+const cancelAutoPlay = () => {
+  if (countdownTimer) {
+    clearInterval(countdownTimer)
+    countdownTimer = null
+  }
+  showNextPrompt.value = false
+}
+
+const handleKeyDown = (event) => {
+  switch (event.key) {
+    case ' ':
+    case 'Enter':
+      event.preventDefault()
+      togglePlay()
+      break
+    case 'ArrowLeft':
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault()
+        emit('video-previous')
+      } else {
+        event.preventDefault()
+        seek(-10)
+      }
+      break
+    case 'ArrowRight':
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault()
+        handleVideoEnded()
+      } else {
+        event.preventDefault()
+        seek(10)
+      }
+      break
+    case 'PageUp':
+      event.preventDefault()
+      emit('video-previous')
+      break
+    case 'PageDown':
+      event.preventDefault()
+      handleVideoEnded()
+      break
+  }
+}
+
 
 // 清理定时器
 watch(() => props.videoUrl, () => {
@@ -128,21 +180,6 @@ const seek = (seconds) => {
   if (videoRef.value) {
     const newTime = videoRef.value.currentTime + seconds
     videoRef.value.currentTime = Math.max(0, Math.min(newTime, duration.value))
-  }
-}
-
-const handleKeyDown = (event) => {
-  switch (event.key) {
-    case ' ':
-    case 'Enter':
-      togglePlay()
-      break
-    case 'ArrowLeft':
-      seek(-10)
-      break
-    case 'ArrowRight':
-      seek(10)
-      break
   }
 }
 

@@ -22,6 +22,7 @@
             :video-id="selectedVideo.id"
             :poster="selectedVideo.poster"
             @video-ended="playNextVideo"
+            @video-previous="playPreviousVideo"
         />
       </div>
     </div>
@@ -51,6 +52,16 @@ const handleVideoSelect = (video) => {
   selectedVideo.value = video
   // 更新当前播放索引
   currentPlaylistIndex.value = currentPlaylist.value.findIndex(v => v.path === video.path)
+}
+
+// 播放上一个视频
+const playPreviousVideo = () => {
+  if (currentPlaylist.value.length === 0) return
+
+  // 计算上一个视频的索引
+  const prevIndex = (currentPlaylistIndex.value - 1 + currentPlaylist.value.length) % currentPlaylist.value.length
+  selectedVideo.value = currentPlaylist.value[prevIndex]
+  currentPlaylistIndex.value = prevIndex
 }
 
 // 播放下一个视频
